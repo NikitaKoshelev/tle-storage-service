@@ -7,22 +7,14 @@ services:
     environment:
       - DB_USER=tle_service_user
       - DB_PASSWORD=tle_service_user
-      - DB_NAME=tle_service
-    expose:
-      - 8080
+      - DB_NAME=tle
+    ports:
+      - 8080:8080
     image: tle_storage_service_backend:latest
     restart: always
     links:
-      - postgres:db
+      - db
   db:
-    build:
-      context: ./postgres
+    image: alpine
     ports:
       - 5432:5432
-  frontend:
-    build:
-      context: .
-    links:
-      - backend
-    ports:
-      - 8080:80
