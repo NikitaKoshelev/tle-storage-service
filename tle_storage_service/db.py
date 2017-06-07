@@ -67,12 +67,15 @@ def run_migrations(db_params):
     import os
     from alembic import command, config
 
+    os.chdir(PROJECT_DIR)
+
     db_params.setdefault('host', 'localhost')
     db_params.setdefault('port', 5432)
 
     alembic_cfg = config.Config(os.path.join(PROJECT_DIR, 'alembic.ini'))
     alembic_cfg.set_main_option('sqlalchemy.url', DSN_TPL % db_params)
-    os.chdir(PROJECT_DIR)
+    alembic_cfg.attributes['configure_logger'] = False
+
     command.upgrade(alembic_cfg, 'head')
 
 
