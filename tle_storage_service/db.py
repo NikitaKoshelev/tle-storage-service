@@ -4,15 +4,20 @@ from datetime import datetime
 import sqlalchemy as sa
 import sqlalchemy.dialects
 
-from .utils import insert_do_nothing
+from .utils import insert_do_nothing, PROJECT_DIR
 
 __all__ = (
     'TLE',
     'insert_tle',
     'metadata',
+    'run_migrations',
 )
 
-metadata = sa.MetaData()
+DSN_TPL = 'postgresql+psycopg2://%(user)s:%(password)s@%(host)s:%(port)s/%(database)s'
+
+
+metadata = sa.MetaData(schema='tle_storage_service')
+
 
 TLE = sa.Table('tle', metadata,
                sa.Column('id',
@@ -34,7 +39,7 @@ TLE = sa.Table('tle', metadata,
                sa.Column('extra_info',
                          sa.dialects.postgresql.JSONB(none_as_null=True)),
                sa.Column('source',
-                         sa.Enum('space-track', 'nasa', name='tle_source_enum'),
+                         sa.Enum('space-track', 'nasa', name='tle_source_enum', schema=metadata.schema),
                          nullable=False,
                          default='space-track',
                          server_default='space-track'),
@@ -56,6 +61,19 @@ TLE = sa.Table('tle', metadata,
                          server_default=sa.false(),
                          nullable=False),
                sa.UniqueConstraint('norad_cat_id', 'dt', 'source', 'is_deleted'))
+
+
+def run_migrations(db_params):
+    import os
+    from alembic import command, config
+
+    db_params.setdefault('host', 'localhost')
+    db_params.setdefault('port', 5432)
+
+    alembic_cfg = config.Config(os.path.join(PROJECT_DIR, 'alembic.ini'))
+    alembic_cfg.set_main_option('sqlalchemy.url', DSN_TPL % db_params)
+    os.chdir(PROJECT_DIR)
+    command.upgrade(alembic_cfg, 'head')
 
 
 async def insert_tle(conn, values, returning=False):

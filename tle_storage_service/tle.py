@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from asyncio import CancelledError
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -30,6 +31,9 @@ async def space_track(engine, api, satellites):
                 params['EPOCH'] = '>{:%Y-%m-%d %H:%M:%S}'.format(dt)
 
             tles = await api.tle(**params)
+            if isinstance(tles, str):
+                raise KeyboardInterrupt(tles)
+
             got_count = len(tles)
 
             logger.debug('[%s] Got %d tle', space_track.__name__, got_count)

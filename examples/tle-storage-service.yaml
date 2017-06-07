@@ -1,6 +1,6 @@
 db:
   database: tle
-  host: localhost
+  host: db
   user: tle_user
   password: qwerty
 

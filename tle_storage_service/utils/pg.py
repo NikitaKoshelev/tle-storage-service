@@ -62,7 +62,7 @@ def reset_sequence_query(table, column):
     if isinstance(table, sa.Table) and isinstance(column, sa.Column):
         return sa.select([
             sa.func.setval(
-                sa.func.pg_get_serial_sequence(table.name, column.name),
+                sa.func.pg_get_serial_sequence(table.key, column.key),
                 sa.select([sa.func.coalesce(sa.func.max(column), 0) + 1]).as_scalar(),
                 sa.false()
             )]

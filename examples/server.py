@@ -12,5 +12,6 @@ DIR = os.path.abspath(os.path.dirname(__file__))
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
-    app = TleStorageService(config=load_cfg(path=os.path.join(DIR, 'config', 'server.yaml')))
-    web.run_app(app, port=8080)
+    cfg = load_cfg(path=os.path.join(DIR, 'config', 'tle-storage-service.yaml'))
+    app = TleStorageService(config=cfg)
+    web.run_app(app)

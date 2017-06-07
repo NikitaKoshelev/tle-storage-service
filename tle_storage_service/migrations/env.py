@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from tle_storage_service.db import metadata as target_metadata
 
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -33,7 +34,8 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+    context.configure(url=url, target_metadata=target_metadata, literal_binds=True,
+                      version_table_schema=target_metadata.schema, compare_type=True)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -52,7 +54,11 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(connection=connection,
-                          target_metadata=target_metadata)
+                          target_metadata=target_metadata,
+                          version_table_schema=target_metadata.schema,
+                          compare_type=True)
+        with context.begin_transaction():
+            connection.execute('create schema if not exists "%s"' % target_metadata.schema)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -9,7 +9,7 @@ from aiopg import create_pool
 from tle_storage_service import load_cfg, listen_pg_notify, LOG_FORMAT
 
 DIR = os.path.abspath(os.path.dirname(__file__))
-CFG = load_cfg(path=os.path.join(DIR, 'config', 'pg-notify.yaml'))
+CFG = load_cfg(path=os.path.join(DIR, 'config', 'tle-storage-service.yaml'))
 
 logger = logging.getLogger(__name__)
 

@@ -6,6 +6,7 @@ import ujson
 from aiohttp import web, WSCloseCode
 from aiopg.sa import create_engine
 
+from .db import run_migrations
 from .handlers import index, query, subscribe
 from .log import logger
 from .middlewares import json_response_middleware
@@ -53,6 +54,10 @@ async def on_shutdown(app):
         await ws.close(code=WSCloseCode.GOING_AWAY, message='Server shutdown')
 
 
+async def do_migrate(app):
+    run_migrations(app['config']['db'])
+
+
 class TleStorageService(web.Application):
     def __init__(self, *, config=None, **kwargs):
         if not isinstance(config, dict):
@@ -63,6 +68,7 @@ class TleStorageService(web.Application):
         self.middlewares.append(json_response_middleware)
         self['config'] = config
         self['channels'] = set()
+        self.on_startup.append(do_migrate)
         self.on_startup.append(start_background_tasks)
         self.on_cleanup.append(cleanup_background_tasks)
         self.on_shutdown.append(on_shutdown)
