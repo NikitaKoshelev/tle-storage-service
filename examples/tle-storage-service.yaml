@@ -5,10 +5,8 @@ db:
   password: qwerty
 
 space-track:
-#  login: <YOUR_LOGIN>
-#  password: <PASSWORD>
-  login: koshelev.n.a@yandex.ru
-  password: K0SHeLeV-941021
+  login: <YOUR_LOGIN>
+  password: <PASSWORD>
 
 sync:
   # Sync's time in hours
