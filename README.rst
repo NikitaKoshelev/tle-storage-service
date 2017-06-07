@@ -46,7 +46,7 @@ Start aiohttp application:
 
     if __name__ == '__main__':
         logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
-        app = TleStorageService(config=load_cfg(path=os.path.join(DIR, 'config', 'periodic.yaml')))
+        app = TleStorageService(config=load_cfg(path=os.path.join(DIR, 'config', 'server.yaml')))
         web.run_app(app, port=8080)
 
 
