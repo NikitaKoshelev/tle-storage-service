@@ -38,6 +38,7 @@ setup(
     long_description=read('README.rst'),
     version=vn,
     packages=find_packages(),
+    include_package_data=True,
     url=url,
     download_url='{url}/archive/{version}.tar.gz'.format(url=url, version=vn),
     license='MIT',

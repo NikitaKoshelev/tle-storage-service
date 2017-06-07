@@ -1,4 +1,4 @@
-FROM nkoshell/tle-storage-service:1.0.0-onbuild
+FROM nkoshell/tle-storage-service:onbuild
 MAINTAINER nkoshell <nikita.koshelev@gmail.com>
 
 ENTRYPOINT python -m periodic

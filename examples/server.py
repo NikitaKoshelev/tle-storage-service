@@ -14,4 +14,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
     cfg = load_cfg(path=os.path.join(DIR, 'config', 'tle-storage-service.yaml'))
     app = TleStorageService(config=cfg)
-    web.run_app(app)
+    web.run_app(app, port=80)
