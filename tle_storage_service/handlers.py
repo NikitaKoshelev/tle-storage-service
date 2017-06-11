@@ -66,15 +66,15 @@ async def index(request):
 async def subscribe(request):
     ws = web.WebSocketResponse()
     await ws.prepare(request)
-    logger.debug('Someone joined.')
     request.app['channels'].add(ws)
+    logger.debug('Someone joined.')
     try:
-        async for msg in ws:
-            if msg.type == WSMsgType.TEXT:
-                if msg.data == 'close':
-                    await ws.close()
-            elif msg.type == WSMsgType.ERROR:
-                logger.debug('ws connection closed with exception %s' % ws.exception())
+        while True:
+            msg = await ws.receive_json()
+            if msg.get('command') == 'close':
+                await ws.close()
+    except Exception as exc:
+        logger.exception(exc)
     finally:
         request.app['channels'].remove(ws)
 
