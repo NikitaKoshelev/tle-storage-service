@@ -120,7 +120,7 @@ async def store_tles(conn, tles):
         return
     if not isinstance(tles, list):
         tles = list(tles)
-    return await insert_tle(conn, tles, returning=TLE.id)
+    return await insert_tle(conn, tles, returning=True)
 
 
 async def delete_expires_tle(conn):
