@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
-from asyncio import CancelledError
 from datetime import datetime
 
 import sqlalchemy as sa
-from aiopg.sa.result import RowProxy
+from aiopg.sa.result import ResultProxy
 
 from .db import TLE, insert_tle
 from .log import logger
@@ -39,7 +38,7 @@ async def space_track(engine, api, satellites):
             logger.debug('[%s] Got %d tle', space_track.__name__, got_count)
 
             result = await store_tles(conn, convert_tles(tles))
-            store_count = result.rowcount if isinstance(result, RowProxy) else 0
+            store_count = result.rowcount if isinstance(result, ResultProxy) else 0
 
             logger.debug('[%s] Stored %d tle', space_track.__name__, store_count)
 
@@ -68,7 +67,7 @@ async def nasa(engine, api):
             values = filter(lambda value: value['dt'] > max_dt, values)
 
         result = await store_tles(conn, values)
-        store_count = result.rowcount if isinstance(result, RowProxy) else 0
+        store_count = result.rowcount if isinstance(result, ResultProxy) else 0
         logger.debug('[%s] Stored %d tle', nasa.__name__, store_count)
 
         await send_pg_notify(conn, 'tle:nasa:update', json.dumps(dict(got=got_count,
@@ -120,7 +119,7 @@ async def store_tles(conn, tles):
         return
     if not isinstance(tles, list):
         tles = list(tles)
-    return await insert_tle(conn, tles, returning=True)
+    return await insert_tle(conn, tles)
 
 
 async def delete_expires_tle(conn):
