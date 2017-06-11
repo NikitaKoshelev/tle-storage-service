@@ -99,6 +99,8 @@ async def insert_do_nothing(conn, table, values, returning=None):
 
     if isinstance(returning, collections.Iterable) and not isinstance(returning, str):
         insert_stmt = insert_stmt.returning(*returning)
+    elif isinstance(returning, sa.Table):
+        insert_stmt = insert_stmt.returning(returning)
 
     # Insert new TLE if already exists do nothing
     return await conn.execute(insert_stmt.on_conflict_do_nothing())
