@@ -55,6 +55,12 @@ async def nasa(engine, api):
 
         got_count = len(values)
         logger.debug('[%s] Got %d tle', nasa.__name__, got_count)
+        if not got_count:
+            return
+
+        expires = await delete_expires_tle(conn)
+        expires_count = expires.rowcount if expires else 0
+        logger.debug('[%s] Expires %d tle', nasa.__name__, expires_count)
 
         dts = [row.dt async for row in get_latest_dt(conn, norad_cat_id=25544)]
         if dts:
@@ -65,9 +71,6 @@ async def nasa(engine, api):
         store_count = result.rowcount if isinstance(result, RowProxy) else 0
         logger.debug('[%s] Stored %d tle', nasa.__name__, store_count)
 
-        expires = await delete_expires_tle(conn)
-        expires_count = expires.rowcount if expires else 0
-        logger.debug('[%s] Expires %d tle', nasa.__name__, expires_count)
         await send_pg_notify(conn, 'tle:nasa:update', json.dumps(dict(got=got_count,
                                                                       stored=store_count,
                                                                       expires=expires_count)))
@@ -120,14 +123,5 @@ async def store_tles(conn, tles):
     return await insert_tle(conn, tles)
 
 
-async def delete_expires_tle(conn, norad_cat_id=25544):
-    where_clause = sa.and_(
-        TLE.c.source == 'nasa',
-        TLE.c.dt <= sa.select([
-            sa.func.max(TLE.c.dt)
-        ]).where(sa.and_(
-            TLE.c.norad_cat_id == norad_cat_id,
-            TLE.c.source == 'space-track'
-        )).as_scalar()
-    )
-    return await conn.execute(TLE.delete().where(where_clause).returning(TLE))
+async def delete_expires_tle(conn):
+    return await conn.execute(TLE.delete().where(TLE.c.source == 'nasa').returning(TLE))
