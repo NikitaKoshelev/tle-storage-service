@@ -6,7 +6,7 @@ from .tle import *
 from .utils import *
 from .web import *
 
-__version__ = '1.0.5'
+__version__ = '1.0.6'
 
 __all__ = (
     db.__all__ +
