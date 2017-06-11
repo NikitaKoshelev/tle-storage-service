@@ -3,7 +3,7 @@ version: "2"
 services:
   periodic:
     build: .
-    entrypoint: ["/tmp/wait-for.sh", "server:80", "--", "python" , "-m", "periodic"]
+    entrypoint: ["/tmp/wait-for.sh", "server:80", "--", "python", "-m", "periodic"]
     volumes:
       - ./tle-storage-service.yaml:/opt/tle-storage-service/config/tle-storage-service.yaml:ro
       - ./wait-for.sh:/tmp/wait-for.sh:ro
@@ -12,7 +12,7 @@ services:
       - server
   server:
     build: .
-    entrypoint: ["/tmp/wait-for.sh", "db:5432", "--", "python" , "-m", "server"]
+    entrypoint: ["/tmp/wait-for.sh", "db:5432", "--", "python", "-m", "server"]
     volumes:
       - ./tle-storage-service.yaml:/opt/tle-storage-service/config/tle-storage-service.yaml:ro
       - ./wait-for.sh:/tmp/wait-for.sh:ro
