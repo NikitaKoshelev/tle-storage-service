@@ -34,8 +34,12 @@ def periodic_task(delay):
         @wraps(coroutine)
         async def runner(*args, **kwargs):
             while True:
-                await coroutine(*args, **kwargs)
-                await asyncio.sleep(delay)
+                try:
+                    await coroutine(*args, **kwargs)
+                except Exception as exc:
+                    logger.exception(exc)
+                finally:
+                    await asyncio.sleep(delay)
 
         return runner
 
