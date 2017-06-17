@@ -29,16 +29,19 @@ def load_cfg(*, filename='dev', path=None):
         return yaml.safe_load(cfg)
 
 
-def periodic_task(delay):
+def periodic_task(delay, retry=30):
     def wrapper(coroutine):
         @wraps(coroutine)
         async def runner(*args, **kwargs):
             while True:
                 try:
                     await coroutine(*args, **kwargs)
-                except Exception as exc:
-                    logger.exception(exc)
-                finally:
+                except RuntimeError:
+                    raise KeyboardInterrupt
+                except Exception:
+                    logger.exception('Task %r raise exception', coroutine)
+                    await asyncio.sleep(retry)
+                else:
                     await asyncio.sleep(delay)
 
         return runner
